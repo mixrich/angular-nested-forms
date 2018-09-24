@@ -5,15 +5,15 @@ First of all, sorry for my English, if it hurts you.
 See the [Demo at https://mixrich.github.io/angular-nested-forms/](https://mixrich.github.io/angular-nested-forms/)
 
 ## The Task
-In my last project, forms became the main part of application. Users creates and managing a lot of entities with forms to reach their goal. Tou can see [Lab365 page](https://lab365.ru) if you know Russian to meet closer what is the project about.
+In my last project, forms became the main part of application. Users creates and managing a lot of entities with forms to reach their goal.
 
 So, let's return to app main part - Forms. In the project there are a lot of forms and many of them have the same functionality but different layouts. For example, you can go to entity view page, click Edit button, open the Edit page and see a big and complex form with dynamical parts (you can add or remove some parts of forms). But in the same time you can edit or create the same entity in the other part of application by just opening modal window, where the same form has a little different layout (for example, some parts are listed inside accordions inside modal, but listed flat on edit page). What makes this forms more complex is that many of parts have their own local logic, for example, show or hide some content, based on one field value of recalculating some values from fields values.
 
 The problem I tried to resolve is how I can create nested parts of forms without need to declare the fields manually and repeat the logic, validators and layout of the same nested parts in different forms.
 
 ## About results
-In this example you can see not just how to create view for nested form, but how to specify the fields and logic inside it without need to to declare them in parent forms.   
-In this exaplme you see how:   
+In this example you can see not just how to create view for nested form, but how to specify the fields and logic inside it without need to to declare them in parent forms.
+In this exaplme you see how:
 * Restore the whole FormGroup instance of form from JSON value. For example, when you click Edit button, you do not need to specify the whole FormGroup structure - it will be created automatically from passed form value and fully patched regardless the equivalense of Form structure and value structure .
 * Build the whole FormGroup from nested forms parts. It is means, that if some fields is part of Nested form, you do not need to specify them in your parent form, because nested form will create them for you. This two points means, that if the field is not specified in parent form FormGroup, but specified in JSON value of form - it will be automatically generated with valid AbstractControl type (Group, Array or Control). If field is not specified in parent form, but declared in nested form - it will be added to parent form. If field specified in parent form, it will be patched with value from JSON and merged with nested form field rules(for example, if nested form field has validators, they will be added to control).
 * How to handle removing nested forms array both from parent form and nested form itself without emitting the event to parent form.
@@ -21,8 +21,8 @@ In this exaplme you see how:
 
 ## Process
 ### Restore FormGroup structure from JSON value.
-Let's create some entities:   
-_base-form_ - it's the main class for out parent forms, which incapsulating the functionality of restoring FormGroup structure from value and other parent forms will be extends this base form.   
+Let's create some entities:
+_base-form_ - it's the main class for out parent forms, which incapsulating the functionality of restoring FormGroup structure from value and other parent forms will be extends this base form.
 Every form has it's FormGroup instance. So let's create some
 ```typescript
 export class BaseFormComponent {
@@ -98,7 +98,7 @@ private setGroupValueToGroup(group: FormGroup, value: any, name: string) {
   this.setFormValues(value, newSubGroup);
 }
 ```
-So, the main idea of restoring is to go recursive through JSON value and, if current value is Array - create the FormArray control for this value and add it to out form. If the current value is object, add control as another nested FormGroup inside out form and recursivelly restore the structure for nested FormGroup. And last, if the value is plain value, just create a control for it and patching it with this value.   
+So, the main idea of restoring is to go recursive through JSON value and, if current value is Array - create the FormArray control for this value and add it to out form. If the current value is object, add control as another nested FormGroup inside out form and recursivelly restore the structure for nested FormGroup. And last, if the value is plain value, just create a control for it and patching it with this value.
 
 Imagine, that you have service or resolver, which will get form value from API and pass it to Profile Edit page. To simplify, let's create the following service:
 ```typescript
@@ -131,7 +131,7 @@ export class FormDataService {
     return filledWithNotesProfile;
   }
 }
-``` 
+```
 This service passed to our profile form some common information and nested fields such as Address Group and Notes Array.
 
 let's create the Profile form for editing this values:
@@ -145,7 +145,7 @@ import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
   selector: 'app-profile-form',
   template: `
     <form class="row" [formGroup]="form">
-      
+
     </form>`
 })
 
@@ -169,9 +169,9 @@ export class ProfileComponent extends BaseFormComponent implements OnInit {
 }
 ```
 As you can mention, we don't specify the full structure for Profile Form, because it will be automatically generated, but we specify something interesting:
-*  lastName: new FormControl('') - this field is not represented in value, but we can add it to our form, if we need. It helps us to add new fields during app development and user can fill it in the next time he will be edit profile form.
-*  email: new FormControl('', [Validators.email]) - here we created the field, which will be created inside the nested form part, but we cpecify field with validators. This approach allow us to use different validators for nested form fields in different parent forms.
-*  notes: new FormArray([]) - the array for nested Notes forms.
+*  `lastName: new FormControl('')` - this field is not represented in value, but we can add it to our form, if we need. It helps us to add new fields during app development and user can fill it in the next time he will be edit profile form.
+*  `email: new FormControl('', [Validators.email])` - here we created the field, which will be created inside the nested form part, but we cpecify field with validators. This approach allow us to use different validators for nested form fields in different parent forms.
+*  `notes: new FormArray([])` - the array for nested Notes forms.
 
 
 So, we need to patch our form with values from service. Let's do it:
@@ -243,14 +243,14 @@ export class BaseNestedform implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    
+
   }
 
 }
 ```
 It will has two attributes:
-* @Input() formGroup: FormGroup; - the parent FormGroup instance for which our form will be nested
-* public nestedFormGroup: FormGroup; - The formGroup instance of nested form itself.
+* `@Input() formGroup: FormGroup;` - the parent FormGroup instance for which our form will be nested
+* `public nestedFormGroup: FormGroup;` - The formGroup instance of nested form itself.
 
 As obvious, we have to add method for merging parent FormGroup and nested FormTemplate to join result fields together. Don't forget, that we have restored parent form stucture and declaredin nested form field can be already exists in parent form.
 ```typescript
@@ -352,7 +352,7 @@ export class ProfileCommonComponent extends BaseNestedform {
   });
 }
 ```
-You can see the new field "Age", which also will be added to parent form.   
+You can see the new field "Age", which also will be added to parent form.
 Even if Email field doesn't has validators, their will be added from parent control declaration for email.
 
 We are ready now to declare nested form for Note entity:
@@ -461,7 +461,7 @@ export class ProfileComponent extends BaseFormComponent implements OnInit {
 ```
 
 ### Handle dynamic Forms Creation
-We can add new Note nested form just pushing empty FormGroup to Notes FormArray control and Note Nested form will be create the structure for it automatically.   
+We can add new Note nested form just pushing empty FormGroup to Notes FormArray control and Note Nested form will be create the structure for it automatically.
 If we want to remove nested Note form instance, we have two ways to do it:
 
 #### Remove nested form from parent
@@ -512,9 +512,9 @@ and call it from Nested view form
 in this case you don't need to emit event or handling remove from your parent form.
 
 
-### Thanks
+## Thanks
 I hope my implementation of nested form will help you in you projects. Thanks for reading.
 
 ## Angular CLI
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.3.   
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.3.
 Read the [Angular CLI](https://github.com/angular/angular-cli) docs .
